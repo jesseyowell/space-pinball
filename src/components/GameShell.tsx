@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { createRenderContext } from '@/game/render/scene';
 
 const loadingStyle = {
   width: '100vw', height: '100vh', background: '#000',
@@ -22,6 +23,19 @@ export default function GameShell() {
     });
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+    const { renderer, scene, camera } = createRenderContext(canvas);
+    let raf: number;
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      renderer.render(scene, camera);
+    };
+    loop();
+    return () => { cancelAnimationFrame(raf); renderer.dispose(); };
+  }, [ready]);
 
   if (error) return <div style={{ ...loadingStyle, color: '#f66' }}>Failed to load: {error}</div>;
 
