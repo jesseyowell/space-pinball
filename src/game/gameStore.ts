@@ -30,17 +30,22 @@ class GameStore {
   }
 
   off<K extends keyof EventMap>(event: K, fn: Listener<EventMap[K]>) {
-    const listeners = this.listeners.get(event);
-    if (!listeners) return;
-    const idx = listeners.indexOf(fn as any);
-    if (idx >= 0) listeners.splice(idx, 1);
+    const updated = (this.listeners.get(event) ?? []).filter(f => f !== fn);
+    if (updated.length === 0) {
+      this.listeners.delete(event);
+    } else {
+      this.listeners.set(event, updated);
+    }
   }
 
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]) {
-    const listeners = this.listeners.get(event);
-    if (listeners) {
-      listeners.forEach(fn => (fn as any)(payload));
-    }
+    (this.listeners.get(event) ?? []).forEach(fn => {
+      try {
+        (fn as any)(payload);
+      } catch (e) {
+        console.error(`[gameStore] listener error for "${String(event)}":`, e);
+      }
+    });
   }
 }
 
