@@ -4,7 +4,8 @@ import RAPIER from '@dimforge/rapier3d';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh } from '@/game/render/meshes';
+import { spawnBall } from '@/game/physics/ball';
 import { GameLoop } from '@/game/GameLoop';
 
 const loadingStyle = {
@@ -42,6 +43,13 @@ export default function GameShell() {
 
     // Create and start the game loop
     const loop = new GameLoop(world, { scene, camera, renderer });
+
+    // Spawn test ball
+    const ball = spawnBall(world, 0, 1, -4);
+    const ballMesh = createBallMesh();
+    scene.add(ballMesh);
+    loop.addSyncPair({ body: ball.body, mesh: ballMesh });
+
     loop.start();
 
     return () => { loop.stop(); renderer.dispose(); };
