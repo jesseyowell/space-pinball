@@ -48,3 +48,17 @@ export function createBumperMesh(): THREE.Mesh {
   });
   return new THREE.Mesh(geo, mat);
 }
+
+export function createRampMesh(): THREE.Mesh {
+  const geo = new THREE.BoxGeometry(0.8, 0.1, 3.0);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x003366,
+    emissive: 0x0055ff,
+    emissiveIntensity: 0.6,
+    transparent: true,
+    opacity: 0.8,
+    roughness: 0.1,
+    metalness: 0.5,
+  });
+  return new THREE.Mesh(geo, mat);
+}

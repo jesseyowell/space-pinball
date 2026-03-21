@@ -5,11 +5,12 @@ import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
 import { createBumpers } from '@/game/physics/bumpers';
+import { createRamps } from '@/game/physics/ramps';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -55,6 +56,16 @@ export default function GameShell() {
       mesh.position.set(pos.x, pos.y, pos.z);
       scene.add(mesh);
       // Bumpers are static — no sync pair needed
+    });
+
+    // Create ramps
+    const ramps = createRamps(world);
+    ramps.forEach(({ body }) => {
+      const mesh = createRampMesh();
+      const pos = body.translation();
+      mesh.position.set(pos.x, pos.y, pos.z);
+      scene.add(mesh);
+      // Ramps are static — no sync pair needed
     });
 
     // Create and start the game loop
