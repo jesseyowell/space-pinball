@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
+import RAPIER from '@dimforge/rapier3d';
 import { createRenderContext } from '@/game/render/scene';
+import { createPhysicsWorld } from '@/game/physics/world';
 
 const loadingStyle = {
   width: '100vw', height: '100vh', background: '#000',
@@ -28,6 +30,7 @@ export default function GameShell() {
     if (!ready) return;
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     const { renderer, scene, camera } = createRenderContext(canvas);
+    const world = createPhysicsWorld();
     let raf: number;
     const loop = () => {
       raf = requestAnimationFrame(loop);
