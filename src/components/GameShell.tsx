@@ -1,13 +1,17 @@
 'use client';
 import { useEffect, useState } from 'react';
 import RAPIER from '@dimforge/rapier3d';
+import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
 import { createTableMesh, createBallMesh, createFlipperMesh } from '@/game/render/meshes';
-import { spawnBall } from '@/game/physics/ball';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
+import { createLauncher } from '@/game/physics/launcher';
+import { InputHandler } from '@/game/input/InputHandler';
+import { stateMachine } from '@/game/state/StateMachine';
+import { gameStore } from '@/game/gameStore';
 
 const loadingStyle = {
   width: '100vw', height: '100vh', background: '#000',
@@ -45,12 +49,6 @@ export default function GameShell() {
     // Create and start the game loop
     const loop = new GameLoop(world, { scene, camera, renderer });
 
-    // Spawn test ball
-    const ball = spawnBall(world, 0, 1, -4);
-    const ballMesh = createBallMesh();
-    scene.add(ballMesh);
-    loop.addSyncPair({ body: ball.body, mesh: ballMesh });
-
     // Create flippers
     const { left, right } = createFlippers(world);
     const leftMesh = createFlipperMesh();
@@ -59,9 +57,37 @@ export default function GameShell() {
     loop.addSyncPair({ body: left.body, mesh: leftMesh });
     loop.addSyncPair({ body: right.body, mesh: rightMesh });
 
+    // Create launcher and spawn ball
+    const launcher = createLauncher(world);
+    let currentBall = launcher.spawnBallInLauncher();
+    const ballMesh = createBallMesh();
+    scene.add(ballMesh);
+    loop.addSyncPair({ body: currentBall.body, mesh: ballMesh });
+
+    // Track active balls and their meshes
+    const activeBalls = [currentBall];
+    const ballMeshMap = new Map<number, THREE.Mesh>();
+    ballMeshMap.set(currentBall.id, ballMesh);
+
+    // Create input handler
+    const input = new InputHandler({ left, right });
+
+    // Listen for launch fire event
+    const unsubLaunchFire = gameStore.on('launchFire', ({ charge }) => {
+      if (currentBall) {
+        launcher.fireBall(currentBall, charge);
+        stateMachine.ballLaunched();
+      }
+    });
+
     loop.start();
 
-    return () => { loop.stop(); renderer.dispose(); };
+    return () => {
+      loop.stop();
+      renderer.dispose();
+      input.destroy();
+      unsubLaunchFire();
+    };
   }, [ready]);
 
   if (error) return <div style={{ ...loadingStyle, color: '#f66' }}>Failed to load: {error}</div>;
