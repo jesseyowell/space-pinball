@@ -4,8 +4,9 @@ import RAPIER from '@dimforge/rapier3d';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh } from '@/game/render/meshes';
 import { spawnBall } from '@/game/physics/ball';
+import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 
 const loadingStyle = {
@@ -49,6 +50,14 @@ export default function GameShell() {
     const ballMesh = createBallMesh();
     scene.add(ballMesh);
     loop.addSyncPair({ body: ball.body, mesh: ballMesh });
+
+    // Create flippers
+    const { left, right } = createFlippers(world);
+    const leftMesh = createFlipperMesh();
+    const rightMesh = createFlipperMesh();
+    scene.add(leftMesh, rightMesh);
+    loop.addSyncPair({ body: left.body, mesh: leftMesh });
+    loop.addSyncPair({ body: right.body, mesh: rightMesh });
 
     loop.start();
 

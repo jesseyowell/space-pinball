@@ -24,3 +24,15 @@ export function createBallMesh(): THREE.Mesh {
   });
   return new THREE.Mesh(geo, mat);
 }
+
+export function createFlipperMesh(): THREE.Mesh {
+  const geo = new THREE.BoxGeometry(1.2, 0.15, 0.25);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x334466,
+    emissive: 0x0033aa,
+    emissiveIntensity: 0.4,
+    roughness: 0.2,
+    metalness: 0.8,
+  });
+  return new THREE.Mesh(geo, mat);
+}
