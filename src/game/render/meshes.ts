@@ -36,3 +36,15 @@ export function createFlipperMesh(): THREE.Mesh {
   });
   return new THREE.Mesh(geo, mat);
 }
+
+export function createBumperMesh(): THREE.Mesh {
+  const geo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xff6600,
+    emissive: 0xff3300,
+    emissiveIntensity: 1.0,
+    roughness: 0.3,
+    metalness: 0.5,
+  });
+  return new THREE.Mesh(geo, mat);
+}

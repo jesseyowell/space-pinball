@@ -5,10 +5,11 @@ import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
+import { createBumpers } from '@/game/physics/bumpers';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -45,6 +46,16 @@ export default function GameShell() {
     const { bodies: tableBodies, drainBody } = createTableBodies(world);
     const tableMesh = createTableMesh();
     scene.add(tableMesh);
+
+    // Create bumpers
+    const bumperBodies = createBumpers(world);
+    bumperBodies.forEach((body) => {
+      const mesh = createBumperMesh();
+      const pos = body.translation();
+      mesh.position.set(pos.x, pos.y, pos.z);
+      scene.add(mesh);
+      // Bumpers are static — no sync pair needed
+    });
 
     // Create and start the game loop
     const loop = new GameLoop(world, { scene, camera, renderer });
