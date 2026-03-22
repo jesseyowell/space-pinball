@@ -14,8 +14,8 @@ export interface Ramp {
 }
 
 const RAMP_DEFS = [
-  { x: -1.8, z: -1, angle: 0.3 },  // left ramp
-  { x:  0.5, z: -4, angle: -0.3 }, // right ramp — upper-center field, clear of launch exit corridor
+  { x: -1.5, z: -1.5, angle: 0.3 },  // left ramp — mid-field left
+  { x:  1.5, z: -1.5, angle: -0.3 }, // right ramp — mid-field right, below guide walls and clear of launch exit
 ];
 
 export function createRamps(world: RAPIER.World): Ramp[] {
