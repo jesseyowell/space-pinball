@@ -13,7 +13,8 @@ export function createBumpers(world: RAPIER.World) {
     const desc = RAPIER.RigidBodyDesc.fixed().setTranslation(x, 0.3, z);
     const body = world.createRigidBody(desc);
     world.createCollider(
-      RAPIER.ColliderDesc.ball(0.4).setRestitution(1.5).setFriction(0),
+      RAPIER.ColliderDesc.ball(0.4).setRestitution(1.5).setFriction(0)
+        .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
       body,
     );
     return body;

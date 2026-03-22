@@ -9,10 +9,10 @@ import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, c
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
-import { createBumpers } from '@/game/physics/bumpers';
-import { createRamps } from '@/game/physics/ramps';
+import { createBumpers, handleBumperCollision } from '@/game/physics/bumpers';
+import { createRamps, handleRampEntrance, handleRampExit } from '@/game/physics/ramps';
 import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
-import { removeBall, promotePrimaryBall } from '@/game/physics/ball';
+import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount } from '@/game/physics/ball';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -74,14 +74,33 @@ export default function GameShell() {
     const trickHoleSensor = createTrickHole(world);
     scene.add(createTrickHoleMesh());
 
+    // Pre-compute ramp sensor list for per-frame intersection checks
+    const rampHandles = ramps.map(r => ({ ramp: r }));
+
     // Create and start the game loop
     // Declare loop first so it can be referenced inside the onStep closure
     let loop: GameLoop;
     loop = new GameLoop(world, { scene, camera, renderer }, () => {
-      // Check drain sensor each frame using world.intersectionPairsWith
-      const drainCollider = drainBody.collider(0);
-      world.intersectionPairsWith(drainCollider, (collider2: RAPIER.Collider) => {
-        const ball = activeBalls.find(b => b.collider === collider2);
+      const eq = loop.getEventQueue();
+
+      // Drain collision events (bumper hits via EventQueue)
+      eq.drainCollisionEvents((h1, h2, started) => {
+        if (!started) return;
+        for (const bumperBody of bumperBodies) {
+          const bc = bumperBody.collider(0);
+          const ballHit = activeBalls.find(b => b.collider.handle === h1 || b.collider.handle === h2);
+          if (ballHit && (bc.handle === h1 || bc.handle === h2)) {
+            handleBumperCollision(world, ballHit.body, bumperBody);
+          }
+        }
+      });
+
+      // Sensor intersection checks via world.intersectionPairsWith
+      // (Rapier v0.19 EventQueue has no drainIntersectionEvents)
+
+      // Drain sensor
+      world.intersectionPairsWith(drainBody.collider(0), (collider2: RAPIER.Collider) => {
+        const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
         if (ball) {
           activeBalls = activeBalls.filter(b => b !== ball);
           removeBall(world, ball);
@@ -92,6 +111,30 @@ export default function GameShell() {
           stateMachine.ballDrained(ball.id);
         }
       });
+
+      // Trick hole sensor
+      world.intersectionPairsWith(trickHoleSensor, (collider2: RAPIER.Collider) => {
+        const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
+        if (ball) handleTrickHoleTrigger(ball);
+      });
+
+      // Ramp entrance/exit sensors
+      for (const { ramp } of rampHandles) {
+        world.intersectionPairsWith(ramp.entranceSensor, (collider2: RAPIER.Collider) => {
+          const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
+          if (ball) handleRampEntrance(ramp, ball.id);
+        });
+        world.intersectionPairsWith(ramp.exitSensor, (collider2: RAPIER.Collider) => {
+          const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
+          if (ball) {
+            const isPrimaryCompletion = handleRampExit(ramp, ball.id, getPrimaryBallId);
+            if (isPrimaryCompletion) {
+              incrementRampCount();
+              // Multiball trigger handled in Task 22
+            }
+          }
+        });
+      }
     });
 
     // Create flippers

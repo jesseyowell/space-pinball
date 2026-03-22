@@ -23,7 +23,8 @@ export function spawnBall(world: RAPIER.World, x: number, y: number, z: number):
   const body = world.createRigidBody(desc);
   const colliderDesc = RAPIER.ColliderDesc.ball(0.2)
     .setRestitution(0.7)
-    .setFriction(0.3);
+    .setFriction(0.3)
+    .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
   const collider = world.createCollider(colliderDesc, body);
   return { id, body, collider };
 }

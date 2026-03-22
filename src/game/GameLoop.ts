@@ -10,22 +10,27 @@ export interface SyncPair {
 export class GameLoop {
   private rafId = 0;
   private pairs: SyncPair[] = [];
+  private eventQueue: RAPIER.EventQueue;
 
   constructor(
     private world: RAPIER.World,
     private ctx: RenderContext,
     private onStep?: () => void,
-  ) {}
+  ) {
+    this.eventQueue = new RAPIER.EventQueue(true);
+  }
 
   addSyncPair(pair: SyncPair) { this.pairs.push(pair); }
   removeSyncPair(body: RAPIER.RigidBody) {
     this.pairs = this.pairs.filter(p => p.body !== body);
   }
 
+  getEventQueue() { return this.eventQueue; }
+
   start() {
     const step = () => {
       this.rafId = requestAnimationFrame(step);
-      this.world.step();
+      this.world.step(this.eventQueue);
       for (const { body, mesh } of this.pairs) {
         const pos = body.translation();
         const rot = body.rotation();
@@ -38,5 +43,8 @@ export class GameLoop {
     step();
   }
 
-  stop() { cancelAnimationFrame(this.rafId); }
+  stop() {
+    cancelAnimationFrame(this.rafId);
+    this.eventQueue.free();
+  }
 }
