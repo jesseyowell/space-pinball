@@ -175,6 +175,22 @@ export default function GameShell() {
         currentBall.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       }
 
+      // Detect ball returning to launch lane during play — respawn without ball loss
+      if (stateMachine.getState() === 'PLAYING' && currentBall) {
+        const pos = currentBall.body.translation();
+        if (pos.x > 2.4 && pos.z > 5.5) {
+          const b = currentBall;
+          currentBall = null;
+          activeBalls = activeBalls.filter(ab => ab.id !== b.id);
+          removeBall(world, b);
+          loop.removeSyncPair(b.body);
+          const mesh = ballMeshMap.get(b.id);
+          if (mesh) scene.remove(mesh);
+          ballMeshMap.delete(b.id);
+          stateMachine.returnToLauncher();
+        }
+      }
+
       effects.tick();
     }, bloomRender);
 

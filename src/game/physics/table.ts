@@ -29,29 +29,28 @@ export function createTableBodies(world: RAPIER.World) {
   // center = (-4.2 + 6.5) / 2 = 1.15, hd = (6.5 - (-4.2)) / 2 = 5.35
   addStatic(0.05, TABLE.WALL_H, 5.35, 2.50, TABLE.WALL_H / 2, 1.15);
 
-  // Launch arc: 3 segments placed directly in the launch lane, progressively angled
-  // so the ball curves smoothly around the top-right corner into the main field.
-  //
-  //  Arc1 (25°) at x=2.7 — in the lane itself, first gentle deflection left
-  //  Arc2 (45°) at x=2.1 — crossing the separator gap, steepening
-  //  Arc3 (60°) at x=1.4 — final redirect into the play field
-  //
-  // All segments sit at z ≈ -5 so they're above the separator and clearly in the
-  // top corner, giving the ball a curved path instead of sharp bounces.
+  // Launch arc: 3 thin segments at the top of the lane that deflect the ball LEFT into the field.
+  // Negative angles (CW rotation) are required — positive angles deflect RIGHT into the wall.
+  // hw=0.12 keeps each segment narrow so it deflects without spanning the full lane width.
+  // half-height=0.2 keeps them short so they guide rather than wall-off.
   const arcSegs = [
-    { x: 2.7,  z: -4.7, hw: 0.25, angle: Math.PI / 7.2 }, // 25°
-    { x: 2.1,  z: -5.1, hw: 0.40, angle: Math.PI / 4   }, // 45°
-    { x: 1.4,  z: -5.3, hw: 0.40, angle: Math.PI / 3   }, // 60°
+    { x: 2.75, z: -4.7, hw: 0.12, angle: -Math.PI / 6  }, // -30°
+    { x: 2.3,  z: -5.1, hw: 0.12, angle: -Math.PI / 4  }, // -45°
+    { x: 1.7,  z: -5.3, hw: 0.12, angle: -Math.PI / 3  }, // -60°
   ];
   arcSegs.forEach(({ x, z, hw, angle }) => {
     const body = world.createRigidBody(
       RAPIER.RigidBodyDesc.fixed()
-        .setTranslation(x, 0.1, z)
+        .setTranslation(x, 0.25, z)
         .setRotation({ x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) }),
     );
-    world.createCollider(RAPIER.ColliderDesc.cuboid(hw, TABLE.WALL_H, 0.1), body);
+    world.createCollider(RAPIER.ColliderDesc.cuboid(hw, 0.2, 0.05), body);
     bodies.push(body);
   });
+
+  // Launch lane floor: extends the table floor under the ball spawn position so a
+  // returning ball lands here instead of falling through the void.
+  addStatic(0.35, 0.05, 0.8, 2.75, -0.05, 6.7);
 
   // Outlane kicker guides: angled walls that redirect side-falling balls back toward the flippers.
   const kickerAngle = Math.PI / 4; // 45°

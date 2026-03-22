@@ -60,6 +60,13 @@ export class StateMachine {
     }, 1500);
   }
 
+  // Ball fell back down the launch lane — respawn without costing a ball.
+  returnToLauncher() {
+    if (this.state !== 'PLAYING') return;
+    this.activeBalls = 0;
+    this.transition('LAUNCHING');
+  }
+
   reset() {
     if (this.ballLostTimer) clearTimeout(this.ballLostTimer);
     this.state = 'IDLE';
