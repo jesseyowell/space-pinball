@@ -34,6 +34,17 @@ export function createTableBodies(world: RAPIER.World) {
   world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, TABLE.WALL_H, 0.1), guideBody);
   bodies.push(guideBody);
 
+  // Second guide segment — shallower angle, continues the arc from the first guide into center field.
+  // Two-stage curve: first guide at z=-4.5 (36°) redirects right→left; this one at z=-3.0 (26°) finishes it.
+  const guide2Angle = Math.PI / 7; // ~26°
+  const guide2Body = world.createRigidBody(
+    RAPIER.RigidBodyDesc.fixed()
+      .setTranslation(1.4, 0.1, -3.0)
+      .setRotation({ x: 0, y: Math.sin(guide2Angle / 2), z: 0, w: Math.cos(guide2Angle / 2) }),
+  );
+  world.createCollider(RAPIER.ColliderDesc.cuboid(0.7, TABLE.WALL_H, 0.1), guide2Body);
+  bodies.push(guide2Body);
+
   // Launch lane separator: thin wall separating the right shooter lane from the main field.
   // Starts at z=2.0 (leaves the top open so the ball can flow into the main field after the guide ramp).
   // Runs from z=2.0 down through the drain area (z=6.5).

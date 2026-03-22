@@ -97,6 +97,21 @@ export function createLaneSeparatorMesh(): THREE.Mesh {
   return mesh;
 }
 
+export function createLaunchGuide2Mesh(): THREE.Mesh {
+  const geo = new THREE.BoxGeometry(1.4, TABLE.WALL_H * 2, 0.2);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x0d1b33,
+    emissive: 0x3366aa,
+    emissiveIntensity: 0.8,
+    roughness: 0.2,
+    metalness: 0.9,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(1.4, 0.1, -3.0);
+  mesh.rotation.y = Math.PI / 7;
+  return mesh;
+}
+
 export function createLaunchGuideMesh(): THREE.Mesh {
   const geo = new THREE.BoxGeometry(1.8, TABLE.WALL_H * 2, 0.2);
   const mat = new THREE.MeshStandardMaterial({

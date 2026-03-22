@@ -30,7 +30,7 @@ export function handleTrickHoleTrigger(ball: Ball) {
 
   // After animation delay, eject ball back into play
   setTimeout(() => {
-    ball.body.setTranslation({ x: EJECT_X, y: 0.5, z: EJECT_Z }, true);
-    ball.body.applyImpulse({ x: (Math.random() - 0.5) * 2, y: 1, z: -4 }, true);
+    ball.body.setTranslation({ x: EJECT_X, y: 0.2, z: EJECT_Z }, true);
+    ball.body.applyImpulse({ x: (Math.random() - 0.5) * 1.5, y: 0.05, z: -2.5 }, true);
   }, 800);
 }
