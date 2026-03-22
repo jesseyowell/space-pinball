@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
 import { createPostProcessing } from '@/game/render/postprocessing';
 import { createStarfield } from '@/game/render/starfield';
+import { Effects } from '@/game/render/effects';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
 import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh } from '@/game/render/meshes';
@@ -48,6 +49,7 @@ export default function GameShell() {
     const { renderer, scene, camera } = createRenderContext(canvas);
     createStarfield(scene);
     const { render: bloomRender } = createPostProcessing(renderer, scene, camera);
+    const effects = new Effects(scene, camera);
     const world = createPhysicsWorld();
 
     // Create table physics bodies and mesh
@@ -96,6 +98,8 @@ export default function GameShell() {
           const ballHit = activeBalls.find(b => b.collider.handle === h1 || b.collider.handle === h2);
           if (ballHit && (bc.handle === h1 || bc.handle === h2)) {
             handleBumperCollision(world, ballHit.body, bumperBody);
+            const bumperPos = bumperBody.translation();
+            effects.bumpHit(new THREE.Vector3(bumperPos.x, bumperPos.y, bumperPos.z));
           }
         }
       });
@@ -120,7 +124,11 @@ export default function GameShell() {
       // Trick hole sensor
       world.intersectionPairsWith(trickHoleSensor, (collider2: RAPIER.Collider) => {
         const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
-        if (ball) handleTrickHoleTrigger(ball);
+        if (ball) {
+          handleTrickHoleTrigger(ball);
+          const ballPos = ball.body.translation();
+          effects.trickHit(new THREE.Vector3(ballPos.x, ballPos.y, ballPos.z));
+        }
       });
 
       // Ramp entrance/exit sensors
@@ -140,6 +148,8 @@ export default function GameShell() {
           }
         });
       }
+
+      effects.tick();
     }, bloomRender);
 
     // Create flippers
