@@ -1,10 +1,10 @@
 import RAPIER from '@dimforge/rapier3d';
 import { Ball, spawnBall } from './ball';
 
-const LAUNCH_X = 2.7;
+const LAUNCH_X = 2.75;
 const LAUNCH_Z = 6.3;  // ball spawns at 5.8, clear of flipper sweep zone
-const MIN_SPEED = 7;   // m/s at zero charge
-const MAX_SPEED = 14;  // m/s at full charge
+const MIN_SPEED = 9;   // m/s at zero charge
+const MAX_SPEED = 16;  // m/s at full charge
 
 export function createLauncher(world: RAPIER.World): {
   spawnBallInLauncher: () => Ball;

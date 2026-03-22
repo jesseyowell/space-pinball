@@ -5,8 +5,8 @@ const FLIPPER_W = 1.2;
 const FLIPPER_H = 0.15;
 const FLIPPER_D = 0.25;
 const FLIP_ANGLE = Math.PI / 4;  // 45° — rest droops down, active flips up
-const FLIP_STIFFNESS = 500;
-const FLIP_DAMPING = 50;
+const FLIP_STIFFNESS = 3000;
+const FLIP_DAMPING = 20;
 
 export interface Flipper {
   body: RAPIER.RigidBody;
@@ -17,7 +17,7 @@ export interface Flipper {
 export function createFlippers(world: RAPIER.World): { left: Flipper; right: Flipper } {
   const make = (side: 'left' | 'right'): Flipper => {
     const sign = side === 'left' ? -1 : 1;
-    const pivotX = sign * (TABLE_W / 2 - 0.8);
+    const pivotX = sign * (TABLE_W / 2 - 1.5);
     const pivotZ = 4.5; // near drain end
 
     // Fixed anchor body
@@ -30,7 +30,7 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
     const flipper = world.createRigidBody(flipperDesc);
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(FLIPPER_W / 2, FLIPPER_H / 2, FLIPPER_D / 2)
-        .setDensity(200)
+        .setDensity(100)
         .setRestitution(0.6).setFriction(0.4),
       flipper,
     );

@@ -8,7 +8,7 @@ import { createStarfield } from '@/game/render/starfield';
 import { Effects } from '@/game/render/effects';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchGuideMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchGuideMesh, createLaneSeparatorMesh, createKickerMeshes } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
@@ -60,6 +60,9 @@ export default function GameShell() {
     const { leftWall, rightWall, topWall } = createBorderMeshes();
     scene.add(leftWall, rightWall, topWall);
     scene.add(createLaunchGuideMesh());
+    scene.add(createLaneSeparatorMesh());
+    const { left: kickerLeft, right: kickerRight } = createKickerMeshes();
+    scene.add(kickerLeft, kickerRight);
 
     // Create bumpers
     const bumperBodies = createBumpers(world);
@@ -167,7 +170,7 @@ export default function GameShell() {
       }
 
       // Keep ball frozen at spawn position until spacebar fires it
-      if (stateMachine.getState() === 'LAUNCHING' && currentBall) {
+      if ((stateMachine.getState() === 'LAUNCHING' || stateMachine.getState() === 'IDLE') && currentBall) {
         currentBall.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
         currentBall.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       }

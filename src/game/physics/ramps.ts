@@ -20,7 +20,7 @@ const RAMP_DEFS = [
 
 export function createRamps(world: RAPIER.World): Ramp[] {
   return RAMP_DEFS.map(({ x, z, angle }) => {
-    const desc = RAPIER.RigidBodyDesc.fixed().setTranslation(x, 0.1, z)
+    const desc = RAPIER.RigidBodyDesc.fixed().setTranslation(x, 0.0, z)
       .setRotation({ x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) });
     const body = world.createRigidBody(desc);
     // Ramp surface

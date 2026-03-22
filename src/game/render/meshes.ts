@@ -63,6 +63,40 @@ export function createRampMesh(): THREE.Mesh {
   return new THREE.Mesh(geo, mat);
 }
 
+export function createKickerMeshes(): { left: THREE.Mesh; right: THREE.Mesh } {
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a3a,
+    emissive: 0x4466cc,
+    emissiveIntensity: 0.7,
+    roughness: 0.2,
+    metalness: 0.8,
+  });
+  const geo = new THREE.BoxGeometry(1.2, TABLE.WALL_H * 2, 0.2);
+  const left = new THREE.Mesh(geo, mat);
+  left.position.set(-2.1, TABLE.WALL_H / 2, 3.2);
+  left.rotation.y = -Math.PI / 4;
+
+  const right = new THREE.Mesh(geo, mat.clone());
+  right.position.set(2.1, TABLE.WALL_H / 2, 3.2);
+  right.rotation.y = Math.PI / 4;
+
+  return { left, right };
+}
+
+export function createLaneSeparatorMesh(): THREE.Mesh {
+  const geo = new THREE.BoxGeometry(0.1, TABLE.WALL_H * 2, 4.5);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x0d1b33,
+    emissive: 0x1a3a6e,
+    emissiveIntensity: 0.6,
+    roughness: 0.3,
+    metalness: 0.9,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(2.50, TABLE.WALL_H / 2, 4.25);
+  return mesh;
+}
+
 export function createLaunchGuideMesh(): THREE.Mesh {
   const geo = new THREE.BoxGeometry(1.8, TABLE.WALL_H * 2, 0.2);
   const mat = new THREE.MeshStandardMaterial({
@@ -73,7 +107,7 @@ export function createLaunchGuideMesh(): THREE.Mesh {
     metalness: 0.9,
   });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(2.0, TABLE.WALL_H / 2, -4.5);
+  mesh.position.set(2.0, 0.1, -4.5);
   mesh.rotation.y = Math.PI / 5;
   return mesh;
 }
