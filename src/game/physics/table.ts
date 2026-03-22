@@ -74,9 +74,12 @@ export function createTableBodies(world: RAPIER.World) {
   // Positioned here so any ball that exits the playing area immediately triggers it —
   // the old z=7.5 position was unreliable because balls would fall in Y and miss it.
   // x narrowed to 2.3 so launch-lane balls (x≈2.75) are handled by returnToLauncher instead.
-  const drainDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, 0, TABLE.L / 2 + 0.2);
+  // Center offset to x=-0.35 so the sensor covers x=-3.0 to +2.3:
+  //   left edge  = -0.35 - 2.65 = -3.0  (reaches left wall)
+  //   right edge = -0.35 + 2.65 = +2.3  (excludes launch lane at x≈2.75)
+  const drainDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(-0.35, 0, TABLE.L / 2 + 0.2);
   const drainBody = world.createRigidBody(drainDesc);
-  const drainCollider = RAPIER.ColliderDesc.cuboid(2.3, 3.0, 0.15).setSensor(true);
+  const drainCollider = RAPIER.ColliderDesc.cuboid(2.65, 3.0, 0.15).setSensor(true);
   world.createCollider(drainCollider, drainBody);
 
   return { bodies, drainBody };
