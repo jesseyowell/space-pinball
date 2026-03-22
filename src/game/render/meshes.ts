@@ -108,7 +108,7 @@ export function createLaunchGuide2Mesh(): THREE.Mesh {
   });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(1.4, 0.1, -3.0);
-  mesh.rotation.y = Math.PI / 7;
+  mesh.rotation.y = Math.PI / 3;
   return mesh;
 }
 

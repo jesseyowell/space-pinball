@@ -34,9 +34,8 @@ export function createTableBodies(world: RAPIER.World) {
   world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, TABLE.WALL_H, 0.1), guideBody);
   bodies.push(guideBody);
 
-  // Second guide segment — shallower angle, continues the arc from the first guide into center field.
-  // Two-stage curve: first guide at z=-4.5 (36°) redirects right→left; this one at z=-3.0 (26°) finishes it.
-  const guide2Angle = Math.PI / 7; // ~26°
+  // Second guide segment — 60° redirects ball down into the play field without creating a pocket.
+  const guide2Angle = Math.PI / 3; // 60°
   const guide2Body = world.createRigidBody(
     RAPIER.RigidBodyDesc.fixed()
       .setTranslation(1.4, 0.1, -3.0)
