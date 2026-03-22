@@ -54,7 +54,7 @@ export default function GameShell() {
     const world = createPhysicsWorld();
 
     // Create table physics bodies and mesh
-    const { bodies: tableBodies, drainBody } = createTableBodies(world);
+    const { bodies: _tableBodies, drainBody } = createTableBodies(world);
     const tableMesh = createTableMesh();
     scene.add(tableMesh);
 
@@ -86,9 +86,7 @@ export default function GameShell() {
     const rampHandles = ramps.map(r => ({ ramp: r }));
 
     // Create and start the game loop
-    // Declare loop first so it can be referenced inside the onStep closure
-    let loop: GameLoop;
-    loop = new GameLoop(world, { scene, camera, renderer }, () => {
+    const loop = new GameLoop(world, { scene, camera, renderer }, () => {
       const eq = loop.getEventQueue();
 
       // Drain collision events (bumper hits via EventQueue)

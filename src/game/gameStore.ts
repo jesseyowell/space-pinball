@@ -19,12 +19,14 @@ export type GameState =
 type Listener<T> = (payload: T) => void;
 
 class GameStore {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private listeners: Map<keyof EventMap, Listener<any>[]> = new Map();
 
   on<K extends keyof EventMap>(event: K, fn: Listener<EventMap[K]>) {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.listeners.get(event)!.push(fn as any);
     return () => this.off(event, fn);
   }
@@ -41,6 +43,7 @@ class GameStore {
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]) {
     (this.listeners.get(event) ?? []).forEach(fn => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (fn as any)(payload);
       } catch (e) {
         console.error(`[gameStore] listener error for "${String(event)}":`, e);

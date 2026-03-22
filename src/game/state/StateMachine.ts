@@ -31,16 +31,18 @@ export class StateMachine {
     if (this.state !== 'PLAYING') return;
     this.activeBalls = 2;
     this.transition('MULTIBALL');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     gameStore.emit('multiBallStart', undefined as any);
   }
 
-  ballDrained(ballId: number) {
+  ballDrained(_ballId: number) {
     if (this.state === 'BALL_LOST') return; // discard
     this.activeBalls = Math.max(0, this.activeBalls - 1);
     if (this.activeBalls >= 1) {
       // Return to PLAYING from MULTIBALL
       if (this.state === 'MULTIBALL') {
         this.transition('PLAYING');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         gameStore.emit('multiBallEnd', undefined as any);
       }
       return;
