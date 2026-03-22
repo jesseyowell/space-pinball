@@ -37,6 +37,18 @@ export function createFlipperMesh(): THREE.Mesh {
   return new THREE.Mesh(geo, mat);
 }
 
+export function createSmallBumperMesh(): THREE.Mesh {
+  const geo = new THREE.CylinderGeometry(0.22, 0.22, 0.3, 12);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x00ccff,
+    emissive: 0x0099cc,
+    emissiveIntensity: 1.2,
+    roughness: 0.2,
+    metalness: 0.6,
+  });
+  return new THREE.Mesh(geo, mat);
+}
+
 export function createBumperMesh(): THREE.Mesh {
   const geo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
   const mat = new THREE.MeshStandardMaterial({

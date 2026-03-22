@@ -8,6 +8,24 @@ const BUMPER_POSITIONS = [
   { x:  0,   z: -3.5 },
 ];
 
+const SMALL_BUMPER_POSITIONS = [
+  { x: -0.9, z: -4.2 },
+  { x:  0.9, z: -4.2 },
+];
+
+export function createSmallBumpers(world: RAPIER.World) {
+  return SMALL_BUMPER_POSITIONS.map(({ x, z }) => {
+    const desc = RAPIER.RigidBodyDesc.fixed().setTranslation(x, 0.3, z);
+    const body = world.createRigidBody(desc);
+    world.createCollider(
+      RAPIER.ColliderDesc.ball(0.22).setRestitution(1.5).setFriction(0)
+        .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
+      body,
+    );
+    return body;
+  });
+}
+
 export function createBumpers(world: RAPIER.World) {
   return BUMPER_POSITIONS.map(({ x, z }) => {
     const desc = RAPIER.RigidBodyDesc.fixed().setTranslation(x, 0.3, z);

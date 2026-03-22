@@ -28,9 +28,13 @@ export function handleTrickHoleTrigger(ball: Ball) {
   // Award points
   scoring.add(POINTS.TRICK_HOLE);
 
-  // After animation delay, eject ball back into play
+  // After animation delay, eject ball in a random direction across a 180° fan
+  // pointing toward the top half of the table so gravity doesn't immediately recapture it.
   setTimeout(() => {
+    const angle = (Math.random() - 0.5) * Math.PI; // -90° to +90° spread
+    const speed = 3.0 + Math.random() * 2.0;
     ball.body.setTranslation({ x: EJECT_X, y: 0.2, z: EJECT_Z }, true);
-    ball.body.applyImpulse({ x: (Math.random() - 0.5) * 1.5, y: 0.05, z: -2.5 }, true);
+    ball.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+    ball.body.applyImpulse({ x: Math.sin(angle) * speed, y: 0.05, z: -Math.cos(angle) * speed }, true);
   }, 800);
 }

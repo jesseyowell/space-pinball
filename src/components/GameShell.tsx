@@ -8,11 +8,11 @@ import { createStarfield } from '@/game/render/starfield';
 import { Effects } from '@/game/render/effects';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchArcMeshes, createLaneSeparatorMesh, createKickerMeshes } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createSmallBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchArcMeshes, createLaneSeparatorMesh, createKickerMeshes } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
-import { createBumpers, handleBumperCollision } from '@/game/physics/bumpers';
+import { createBumpers, createSmallBumpers, handleBumperCollision } from '@/game/physics/bumpers';
 import { createRamps, handleRampEntrance, handleRampExit } from '@/game/physics/ramps';
 import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
 import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount, canTriggerMultiball, setMultifired, spawnBall, resetBallState } from '@/game/physics/ball';
@@ -71,7 +71,15 @@ export default function GameShell() {
       const pos = body.translation();
       mesh.position.set(pos.x, pos.y, pos.z);
       scene.add(mesh);
-      // Bumpers are static — no sync pair needed
+    });
+
+    const smallBumperBodies = createSmallBumpers(world);
+    smallBumperBodies.forEach((body) => {
+      const mesh = createSmallBumperMesh();
+      const pos = body.translation();
+      mesh.position.set(pos.x, pos.y, pos.z);
+      scene.add(mesh);
+      // Small bumpers are static — no sync pair needed
     });
 
     // Create ramps
@@ -98,7 +106,7 @@ export default function GameShell() {
       // Drain collision events (bumper hits via EventQueue)
       eq.drainCollisionEvents((h1, h2, started) => {
         if (!started) return;
-        for (const bumperBody of bumperBodies) {
+        for (const bumperBody of [...bumperBodies, ...smallBumperBodies]) {
           const bc = bumperBody.collider(0);
           const ballHit = activeBalls.find(b => b.collider.handle === h1 || b.collider.handle === h2);
           if (ballHit && (bc.handle === h1 || bc.handle === h2)) {
@@ -116,6 +124,7 @@ export default function GameShell() {
       world.intersectionPairsWith(drainBody.collider(0), (collider2: RAPIER.Collider) => {
         const ball = activeBalls.find(b => b.collider.handle === collider2.handle);
         if (ball) {
+          if (ball === currentBall) currentBall = null;
           activeBalls = activeBalls.filter(b => b !== ball);
           removeBall(world, ball);
           loop.removeSyncPair(ball.body);
