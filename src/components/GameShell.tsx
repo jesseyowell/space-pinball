@@ -8,7 +8,7 @@ import { createStarfield } from '@/game/render/starfield';
 import { Effects } from '@/game/render/effects';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
@@ -57,6 +57,8 @@ export default function GameShell() {
     const { bodies: _tableBodies, drainBody } = createTableBodies(world);
     const tableMesh = createTableMesh();
     scene.add(tableMesh);
+    const { leftWall, rightWall, topWall } = createBorderMeshes();
+    scene.add(leftWall, rightWall, topWall);
 
     // Create bumpers
     const bumperBodies = createBumpers(world);
@@ -161,6 +163,12 @@ export default function GameShell() {
             }
           }
         });
+      }
+
+      // Keep ball frozen in the launcher until fired
+      if (stateMachine.getState() === 'LAUNCHING' && currentBall) {
+        currentBall.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        currentBall.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       }
 
       effects.tick();

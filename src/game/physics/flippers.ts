@@ -42,9 +42,9 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
     );
     const joint = world.createImpulseJoint(jointData, anchor, flipper, true) as RAPIER.RevoluteImpulseJoint;
 
-    // Immediately hold at rest: left droops +Z (drain), right droops +Z (drain)
-    // dir: left=+1 → +FLIP_ANGLE, right=-1 → -FLIP_ANGLE
-    const dir = -sign;
+    // Immediately hold at rest: left droops toward +Z (drain), right mirrors.
+    // Positive joint angle = UP for left, DOWN for right — so rest uses -sign.
+    const dir = sign;
     joint.configureMotorPosition(dir * FLIP_ANGLE, FLIP_STIFFNESS, FLIP_DAMPING);
 
     return { body: flipper, joint, side };
@@ -55,8 +55,8 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
 
 export function activateFlipper(flipper: Flipper) {
   const j = flipper.joint as RAPIER.RevoluteImpulseJoint;
-  const dir = flipper.side === 'left' ? 1 : -1;
-  j.configureMotorPosition(-dir * FLIP_ANGLE, FLIP_STIFFNESS, FLIP_DAMPING);
+  const dir = flipper.side === 'left' ? -1 : 1;
+  j.configureMotorPosition(dir * FLIP_ANGLE, FLIP_STIFFNESS, FLIP_DAMPING);
 }
 
 export function deactivateFlipper(flipper: Flipper) {

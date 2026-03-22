@@ -63,6 +63,29 @@ export function createRampMesh(): THREE.Mesh {
   return new THREE.Mesh(geo, mat);
 }
 
+export function createBorderMeshes(): { leftWall: THREE.Mesh; rightWall: THREE.Mesh; topWall: THREE.Mesh } {
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x0d1b33,
+    emissive: 0x1a3a6e,
+    emissiveIntensity: 0.6,
+    roughness: 0.3,
+    metalness: 0.9,
+  });
+  const wallH = TABLE.WALL_H * 2;   // full height (WALL_H is half-extent)
+  const wallT = TABLE.WALL_T;        // full thickness
+
+  const leftWall = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, TABLE.L), mat);
+  leftWall.position.set(-(TABLE.W / 2 + TABLE.WALL_T / 2), TABLE.WALL_H / 2, 0);
+
+  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, TABLE.L), mat.clone());
+  rightWall.position.set(TABLE.W / 2 + TABLE.WALL_T / 2, TABLE.WALL_H / 2, 0);
+
+  const topWall = new THREE.Mesh(new THREE.BoxGeometry(TABLE.W + wallT * 2, wallH, wallT), mat.clone());
+  topWall.position.set(0, TABLE.WALL_H / 2, -(TABLE.L / 2 + TABLE.WALL_T / 2));
+
+  return { leftWall, rightWall, topWall };
+}
+
 export function createTrickHoleMesh(): THREE.Mesh {
   const geo = new THREE.CircleGeometry(0.35, 32);
   const mat = new THREE.MeshStandardMaterial({
