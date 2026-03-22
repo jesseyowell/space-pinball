@@ -3,8 +3,8 @@ import { Ball, spawnBall } from './ball';
 
 const LAUNCH_X = 2.7;  // right gutter
 const LAUNCH_Z = 5.0;  // near drain
-const MIN_IMPULSE = 7;
-const MAX_IMPULSE = 14;
+const MIN_IMPULSE = 15;
+const MAX_IMPULSE = 28;
 
 export function createLauncher(world: RAPIER.World): {
   spawnBallInLauncher: () => Ball;
