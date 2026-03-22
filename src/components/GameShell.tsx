@@ -166,6 +166,12 @@ export default function GameShell() {
         });
       }
 
+      // Keep ball frozen at spawn position until spacebar fires it
+      if (stateMachine.getState() === 'LAUNCHING' && currentBall) {
+        currentBall.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        currentBall.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+      }
+
       effects.tick();
     }, bloomRender);
 

@@ -1,10 +1,10 @@
 import RAPIER from '@dimforge/rapier3d';
 import { Ball, spawnBall } from './ball';
 
-const LAUNCH_X = 2.7;  // right gutter
-const LAUNCH_Z = 5.0;  // near drain
-const MIN_IMPULSE = 18;
-const MAX_IMPULSE = 36;
+const LAUNCH_X = 2.7;
+const LAUNCH_Z = 6.3;  // ball spawns at 5.8, clear of flipper sweep zone
+const MIN_SPEED = 7;   // m/s at zero charge
+const MAX_SPEED = 14;  // m/s at full charge
 
 export function createLauncher(world: RAPIER.World): {
   spawnBallInLauncher: () => Ball;
@@ -12,18 +12,12 @@ export function createLauncher(world: RAPIER.World): {
   isAboveLauncher: (ball: Ball) => boolean;
 } {
   return {
-    spawnBallInLauncher: () => {
-      const ball = spawnBall(world, LAUNCH_X, 0.3, LAUNCH_Z - 0.5);
-      // Hold kinematic so the flipper motor sweep can't push it before launch
-      ball.body.setBodyType(RAPIER.RigidBodyType.KinematicPositionBased, true);
-      return ball;
-    },
+    spawnBallInLauncher: () => spawnBall(world, LAUNCH_X, 0.22, LAUNCH_Z - 0.5),
 
     fireBall: (ball: Ball, charge: number) => {
-      // Re-enable physics, then send ball up the table
-      ball.body.setBodyType(RAPIER.RigidBodyType.Dynamic, true);
-      const impulse = MIN_IMPULSE + (MAX_IMPULSE - MIN_IMPULSE) * charge;
-      ball.body.applyImpulse({ x: 0, y: 0, z: -impulse }, true);
+      const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * charge;
+      // setLinvel is reliable regardless of physics step timing
+      ball.body.setLinvel({ x: 0, y: 0, z: -speed }, true);
     },
 
     isAboveLauncher: (ball: Ball) => {
