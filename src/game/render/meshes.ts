@@ -62,3 +62,17 @@ export function createRampMesh(): THREE.Mesh {
   });
   return new THREE.Mesh(geo, mat);
 }
+
+export function createTrickHoleMesh(): THREE.Mesh {
+  const geo = new THREE.CircleGeometry(0.35, 32);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    emissive: 0x440088,
+    emissiveIntensity: 2.0,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(0, 0.01, -2.5);
+  return mesh;
+}

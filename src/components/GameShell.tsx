@@ -5,12 +5,13 @@ import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
 import { createBumpers } from '@/game/physics/bumpers';
 import { createRamps } from '@/game/physics/ramps';
+import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -67,6 +68,10 @@ export default function GameShell() {
       scene.add(mesh);
       // Ramps are static — no sync pair needed
     });
+
+    // Create trick hole
+    const trickHoleSensor = createTrickHole(world);
+    scene.add(createTrickHoleMesh());
 
     // Create and start the game loop
     const loop = new GameLoop(world, { scene, camera, renderer });
