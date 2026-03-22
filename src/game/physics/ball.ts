@@ -36,3 +36,11 @@ export function promotePrimaryBall(activeBalls: Ball[]) {
   if (activeBalls.length === 0) return;
   primaryBallId = Math.min(...activeBalls.map(b => b.id));
 }
+
+export let rampCount = 0;
+export let multifired = false;
+
+export function incrementRampCount() { rampCount++; }
+export function resetBallState() { rampCount = 0; multifired = false; }
+export function canTriggerMultiball() { return rampCount >= 3 && !multifired; }
+export function setMultifired() { multifired = true; rampCount = 0; }

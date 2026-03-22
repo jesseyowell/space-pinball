@@ -12,6 +12,7 @@ import { createLauncher } from '@/game/physics/launcher';
 import { createBumpers } from '@/game/physics/bumpers';
 import { createRamps } from '@/game/physics/ramps';
 import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
+import { removeBall, promotePrimaryBall } from '@/game/physics/ball';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -74,7 +75,24 @@ export default function GameShell() {
     scene.add(createTrickHoleMesh());
 
     // Create and start the game loop
-    const loop = new GameLoop(world, { scene, camera, renderer });
+    // Declare loop first so it can be referenced inside the onStep closure
+    let loop: GameLoop;
+    loop = new GameLoop(world, { scene, camera, renderer }, () => {
+      // Check drain sensor each frame using world.intersectionPairsWith
+      const drainCollider = drainBody.collider(0);
+      world.intersectionPairsWith(drainCollider, (collider2: RAPIER.Collider) => {
+        const ball = activeBalls.find(b => b.collider === collider2);
+        if (ball) {
+          activeBalls = activeBalls.filter(b => b !== ball);
+          removeBall(world, ball);
+          loop.removeSyncPair(ball.body);
+          const mesh = ballMeshMap.get(ball.id);
+          if (mesh) { scene.remove(mesh); ballMeshMap.delete(ball.id); }
+          promotePrimaryBall(activeBalls);
+          stateMachine.ballDrained(ball.id);
+        }
+      });
+    });
 
     // Create flippers
     const { left, right } = createFlippers(world);
@@ -92,7 +110,7 @@ export default function GameShell() {
     loop.addSyncPair({ body: currentBall.body, mesh: ballMesh });
 
     // Track active balls and their meshes
-    const activeBalls = [currentBall];
+    let activeBalls = [currentBall];
     const ballMeshMap = new Map<number, THREE.Mesh>();
     ballMeshMap.set(currentBall.id, ballMesh);
 
