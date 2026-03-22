@@ -1,6 +1,8 @@
 import { stateMachine } from '../state/StateMachine';
 import { Flipper, activateFlipper, deactivateFlipper } from '../physics/flippers';
 import { gameStore } from '../gameStore';
+import { scoring } from '../state/scoring';
+import { resetBallState } from '../physics/ball';
 
 export class InputHandler {
   private chargeStart: number | null = null;
@@ -13,6 +15,14 @@ export class InputHandler {
 
   private onDown = (e: KeyboardEvent) => {
     const state = stateMachine.getState();
+
+    if ((e.code === 'Space' || e.code === 'Enter') && state === 'GAME_OVER') {
+      e.preventDefault();
+      scoring.reset();
+      resetBallState();
+      stateMachine.reset();
+      return;
+    }
 
     if ((e.code === 'Space' || e.code === 'Enter') && state === 'IDLE') {
       e.preventDefault();

@@ -15,7 +15,7 @@ import { createLauncher } from '@/game/physics/launcher';
 import { createBumpers, handleBumperCollision } from '@/game/physics/bumpers';
 import { createRamps, handleRampEntrance, handleRampExit } from '@/game/physics/ramps';
 import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
-import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount, canTriggerMultiball, setMultifired, spawnBall } from '@/game/physics/ball';
+import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount, canTriggerMultiball, setMultifired, spawnBall, resetBallState } from '@/game/physics/ball';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
@@ -202,6 +202,30 @@ export default function GameShell() {
     // Listen for multiball end event
     const unsubMultiBallEnd = gameStore.on('multiBallEnd', () => scoring.setMultiplier(1));
 
+    // Listen for state changes to manage ball lifecycle
+    const unsubStateChange = gameStore.on('stateChange', ({ state }) => {
+      if (state === 'BALL_LOST' || state === 'GAME_OVER') {
+        activeBalls.forEach(b => {
+          removeBall(world, b);
+          loop.removeSyncPair(b.body);
+          const mesh = ballMeshMap.get(b.id);
+          if (mesh) scene.remove(mesh);
+        });
+        activeBalls = [];
+        ballMeshMap.clear();
+        scoring.setMultiplier(1);
+        resetBallState();
+      }
+      if (state === 'LAUNCHING') {
+        currentBall = launcher.spawnBallInLauncher();
+        const mesh = createBallMesh();
+        scene.add(mesh);
+        activeBalls = [currentBall];
+        ballMeshMap.set(currentBall.id, mesh);
+        loop.addSyncPair({ body: currentBall.body, mesh });
+      }
+    });
+
     loop.start();
 
     return () => {
@@ -210,6 +234,7 @@ export default function GameShell() {
       input.destroy();
       unsubLaunchFire();
       unsubMultiBallEnd();
+      unsubStateChange();
     };
   }, [ready]);
 
