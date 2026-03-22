@@ -16,6 +16,7 @@ import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount } 
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
+import HUD from './HUD';
 
 const loadingStyle = {
   width: '100vw', height: '100vh', background: '#000',
@@ -191,6 +192,7 @@ export default function GameShell() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <canvas id="game-canvas" style={{ display: 'block', width: '100%', height: '100%' }} />
+      <HUD />
     </div>
   );
 }
