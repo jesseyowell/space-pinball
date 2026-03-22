@@ -15,7 +15,7 @@ export interface Ramp {
 
 const RAMP_DEFS = [
   { x: -1.8, z: -1, angle: 0.3 },  // left ramp
-  { x:  1.0, z: -2, angle: -0.3 }, // right ramp — moved left/up to clear the launch lane
+  { x:  0.5, z: -4, angle: -0.3 }, // right ramp — upper-center field, clear of launch exit corridor
 ];
 
 export function createRamps(world: RAPIER.World): Ramp[] {
