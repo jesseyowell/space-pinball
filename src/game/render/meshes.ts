@@ -113,7 +113,7 @@ export function createLaunchArcMeshes(): THREE.Mesh[] {
   ];
   return segs.map(({ x, z, w, angle }) => {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, TABLE.WALL_H * 2, 0.2), mat.clone());
-    mesh.position.set(x, 0.1, z);
+    mesh.position.set(x, 0.4, z);
     mesh.rotation.y = angle;
     return mesh;
   });
