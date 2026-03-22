@@ -107,9 +107,9 @@ export function createLaunchArcMeshes(): THREE.Mesh[] {
     metalness: 0.9,
   });
   const segs = [
-    { x: 2.7,  z: -4.7, w: 0.5,  angle: Math.PI / 7.2 },
-    { x: 2.1,  z: -5.1, w: 0.8,  angle: Math.PI / 4   },
-    { x: 1.4,  z: -5.3, w: 0.8,  angle: Math.PI / 3   },
+    { x: 2.7,  z: -4.7, w: 0.15, angle: Math.PI / 7.2 },
+    { x: 2.1,  z: -5.1, w: 0.15, angle: Math.PI / 4   },
+    { x: 1.4,  z: -5.3, w: 0.15, angle: Math.PI / 3   },
   ];
   return segs.map(({ x, z, w, angle }) => {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, TABLE.WALL_H * 2, 0.2), mat.clone());
