@@ -175,10 +175,17 @@ export default function GameShell() {
         currentBall.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
       }
 
-      // Detect ball returning to launch lane during play — respawn without ball loss
+      // Clamp y-velocity on all balls — prevents ramp edges from launching balls into the void
+      activeBalls.forEach(b => {
+        const vel = b.body.linvel();
+        if (vel.y > 1.5) b.body.setLinvel({ x: vel.x, y: 1.5, z: vel.z }, true);
+      });
+
+      // Detect ball returning to launch lane during play — respawn without ball loss.
+      // Threshold z > 6.1 (past floor edge) prevents false trigger at spawn position z=5.8.
       if (stateMachine.getState() === 'PLAYING' && currentBall) {
         const pos = currentBall.body.translation();
-        if (pos.x > 2.4 && pos.z > 5.5) {
+        if (pos.x > 2.4 && pos.z > 6.1) {
           const b = currentBall;
           currentBall = null;
           activeBalls = activeBalls.filter(ab => ab.id !== b.id);
