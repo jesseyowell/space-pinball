@@ -28,7 +28,7 @@ export function createTableBodies(world: RAPIER.World) {
   const guideAngle = Math.PI / 5; // 36°
   const guideBody = world.createRigidBody(
     RAPIER.RigidBodyDesc.fixed()
-      .setTranslation(2.0, TABLE.WALL_H / 2, 2.6)
+      .setTranslation(2.0, TABLE.WALL_H / 2, -4.5)
       .setRotation({ x: 0, y: Math.sin(guideAngle / 2), z: 0, w: Math.cos(guideAngle / 2) }),
   );
   world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, TABLE.WALL_H, 0.1), guideBody);

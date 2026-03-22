@@ -73,7 +73,7 @@ export function createLaunchGuideMesh(): THREE.Mesh {
     metalness: 0.9,
   });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(2.0, TABLE.WALL_H / 2, 2.6);
+  mesh.position.set(2.0, TABLE.WALL_H / 2, -4.5);
   mesh.rotation.y = Math.PI / 5;
   return mesh;
 }

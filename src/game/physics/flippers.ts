@@ -30,7 +30,8 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
     const flipper = world.createRigidBody(flipperDesc);
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(FLIPPER_W / 2, FLIPPER_H / 2, FLIPPER_D / 2)
-        .setRestitution(0.4).setFriction(0.6),
+        .setDensity(200)
+        .setRestitution(0.6).setFriction(0.4),
       flipper,
     );
 
