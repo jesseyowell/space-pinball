@@ -216,6 +216,7 @@ export default function GameShell() {
     // Listen for state changes to manage ball lifecycle
     const unsubStateChange = gameStore.on('stateChange', ({ state }) => {
       if (state === 'BALL_LOST' || state === 'GAME_OVER') {
+        currentBall = null;
         activeBalls.forEach(b => {
           removeBall(world, b);
           loop.removeSyncPair(b.body);
