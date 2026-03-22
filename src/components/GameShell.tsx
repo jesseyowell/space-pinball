@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import RAPIER from '@dimforge/rapier3d';
 import * as THREE from 'three';
 import { createRenderContext } from '@/game/render/scene';
+import { createPostProcessing } from '@/game/render/postprocessing';
+import { createStarfield } from '@/game/render/starfield';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
 import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh } from '@/game/render/meshes';
@@ -44,6 +46,8 @@ export default function GameShell() {
     if (!ready) return;
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     const { renderer, scene, camera } = createRenderContext(canvas);
+    createStarfield(scene);
+    const { render: bloomRender } = createPostProcessing(renderer, scene, camera);
     const world = createPhysicsWorld();
 
     // Create table physics bodies and mesh
@@ -136,7 +140,7 @@ export default function GameShell() {
           }
         });
       }
-    });
+    }, bloomRender);
 
     // Create flippers
     const { left, right } = createFlippers(world);

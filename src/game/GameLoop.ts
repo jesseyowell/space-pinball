@@ -16,6 +16,7 @@ export class GameLoop {
     private world: RAPIER.World,
     private ctx: RenderContext,
     private onStep?: () => void,
+    private renderFn?: () => void,
   ) {
     this.eventQueue = new RAPIER.EventQueue(true);
   }
@@ -38,7 +39,7 @@ export class GameLoop {
         mesh.quaternion.set(rot.x, rot.y, rot.z, rot.w);
       }
       this.onStep?.();
-      this.ctx.renderer.render(this.ctx.scene, this.ctx.camera);
+      (this.renderFn ?? (() => this.ctx.renderer.render(this.ctx.scene, this.ctx.camera)))();
     };
     step();
   }
