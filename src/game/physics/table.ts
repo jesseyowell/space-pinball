@@ -24,6 +24,16 @@ export function createTableBodies(world: RAPIER.World) {
   // Top wall
   addStatic(TABLE.W / 2, TABLE.WALL_H, TABLE.WALL_T / 2, 0, TABLE.WALL_H / 2, -TABLE.L / 2 - TABLE.WALL_T / 2);
 
+  // Launch guide ramp: angled wall at top of right lane, deflects ball into main field
+  const guideAngle = Math.PI / 5; // 36°
+  const guideBody = world.createRigidBody(
+    RAPIER.RigidBodyDesc.fixed()
+      .setTranslation(2.0, TABLE.WALL_H / 2, 2.6)
+      .setRotation({ x: 0, y: Math.sin(guideAngle / 2), z: 0, w: Math.cos(guideAngle / 2) }),
+  );
+  world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, TABLE.WALL_H, 0.1), guideBody);
+  bodies.push(guideBody);
+
   // Drain sensor (bottom strip)
   const drainDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, 0, TABLE.L / 2 + 0.5);
   const drainBody = world.createRigidBody(drainDesc);

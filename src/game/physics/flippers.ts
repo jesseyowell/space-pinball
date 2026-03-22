@@ -55,12 +55,14 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
 
 export function activateFlipper(flipper: Flipper) {
   const j = flipper.joint as RAPIER.RevoluteImpulseJoint;
-  const dir = flipper.side === 'left' ? -1 : 1;
+  // Active = opposite of rest: left goes to +FLIP_ANGLE, right to -FLIP_ANGLE
+  const dir = flipper.side === 'left' ? 1 : -1;
   j.configureMotorPosition(dir * FLIP_ANGLE, FLIP_STIFFNESS, FLIP_DAMPING);
 }
 
 export function deactivateFlipper(flipper: Flipper) {
   const j = flipper.joint as RAPIER.RevoluteImpulseJoint;
-  const dir = flipper.side === 'left' ? 1 : -1;
+  // Rest = same as init: left at -FLIP_ANGLE, right at +FLIP_ANGLE
+  const dir = flipper.side === 'left' ? -1 : 1;
   j.configureMotorPosition(dir * FLIP_ANGLE, FLIP_STIFFNESS, FLIP_DAMPING);
 }

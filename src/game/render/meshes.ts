@@ -63,6 +63,21 @@ export function createRampMesh(): THREE.Mesh {
   return new THREE.Mesh(geo, mat);
 }
 
+export function createLaunchGuideMesh(): THREE.Mesh {
+  const geo = new THREE.BoxGeometry(1.8, TABLE.WALL_H * 2, 0.2);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x0d1b33,
+    emissive: 0x3366aa,
+    emissiveIntensity: 0.8,
+    roughness: 0.2,
+    metalness: 0.9,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(2.0, TABLE.WALL_H / 2, 2.6);
+  mesh.rotation.y = Math.PI / 5;
+  return mesh;
+}
+
 export function createBorderMeshes(): { leftWall: THREE.Mesh; rightWall: THREE.Mesh; topWall: THREE.Mesh } {
   const mat = new THREE.MeshStandardMaterial({
     color: 0x0d1b33,
