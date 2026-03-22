@@ -22,6 +22,7 @@ export function spawnBall(world: RAPIER.World, x: number, y: number, z: number):
     .setAngularDamping(0.5);
   const body = world.createRigidBody(desc);
   const colliderDesc = RAPIER.ColliderDesc.ball(0.2)
+    .setDensity(76)
     .setRestitution(0.7)
     .setFriction(0.3)
     .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);

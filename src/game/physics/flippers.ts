@@ -23,9 +23,10 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
     const anchorDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(pivotX, 0.2, pivotZ);
     const anchor = world.createRigidBody(anchorDesc);
 
-    // Flipper body
+    // Flipper body — pre-rotated to rest angle so it starts at 45° down
     const flipperDesc = RAPIER.RigidBodyDesc.dynamic()
-      .setTranslation(pivotX + sign * FLIPPER_W / 2, 0.2, pivotZ);
+      .setTranslation(pivotX + sign * FLIPPER_W / 2, 0.2, pivotZ)
+      .setRotation({ x: 0, y: Math.sin(-sign * REST_ANGLE / 2), z: 0, w: Math.cos(REST_ANGLE / 2) });
     const flipper = world.createRigidBody(flipperDesc);
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(FLIPPER_W / 2, FLIPPER_H / 2, FLIPPER_D / 2)
@@ -47,12 +48,17 @@ export function createFlippers(world: RAPIER.World): { left: Flipper; right: Fli
   return { left: make('left'), right: make('right') };
 }
 
+const FLIP_STIFFNESS = 500;
+const FLIP_DAMPING = 50;
+
 export function activateFlipper(flipper: Flipper) {
   const j = flipper.joint as RAPIER.RevoluteImpulseJoint;
-  j.configureMotorVelocity(20, 100);
+  // Joint angle 0 = rest (45° down). Active = 0.9 rad the other way (mirrored per side).
+  const dir = flipper.side === 'left' ? -1 : 1;
+  j.configureMotorPosition(dir * (REST_ANGLE + Math.abs(ACTIVE_ANGLE)), FLIP_STIFFNESS, FLIP_DAMPING);
 }
 
 export function deactivateFlipper(flipper: Flipper) {
   const j = flipper.joint as RAPIER.RevoluteImpulseJoint;
-  j.configureMotorVelocity(-20, 100);
+  j.configureMotorPosition(0, FLIP_STIFFNESS, FLIP_DAMPING);
 }
