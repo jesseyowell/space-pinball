@@ -4,9 +4,7 @@ const TABLE_W = 6;
 const FLIPPER_W = 1.2;
 const FLIPPER_H = 0.15;
 const FLIPPER_D = 0.25;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const REST_ANGLE = 0.45;   // radians, resting down
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ACTIVE_ANGLE = -0.45; // radians, raised up
 
 export interface Flipper {
