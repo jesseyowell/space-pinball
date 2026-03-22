@@ -84,7 +84,8 @@ export function createKickerMeshes(): { left: THREE.Mesh; right: THREE.Mesh } {
 }
 
 export function createLaneSeparatorMesh(): THREE.Mesh {
-  const geo = new THREE.BoxGeometry(0.1, TABLE.WALL_H * 2, 4.5);
+  // Length matches physics: center=1.15, hd=5.35 → full length=10.7
+  const geo = new THREE.BoxGeometry(0.1, TABLE.WALL_H * 2, 10.7);
   const mat = new THREE.MeshStandardMaterial({
     color: 0x0d1b33,
     emissive: 0x1a3a6e,
@@ -93,12 +94,11 @@ export function createLaneSeparatorMesh(): THREE.Mesh {
     metalness: 0.9,
   });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(2.50, TABLE.WALL_H / 2, 4.25);
+  mesh.position.set(2.50, TABLE.WALL_H / 2, 1.15);
   return mesh;
 }
 
-export function createLaunchGuide2Mesh(): THREE.Mesh {
-  const geo = new THREE.BoxGeometry(1.4, TABLE.WALL_H * 2, 0.2);
+export function createLaunchArcMeshes(): THREE.Mesh[] {
   const mat = new THREE.MeshStandardMaterial({
     color: 0x0d1b33,
     emissive: 0x3366aa,
@@ -106,25 +106,17 @@ export function createLaunchGuide2Mesh(): THREE.Mesh {
     roughness: 0.2,
     metalness: 0.9,
   });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(1.4, 0.1, -3.0);
-  mesh.rotation.y = Math.PI / 3;
-  return mesh;
-}
-
-export function createLaunchGuideMesh(): THREE.Mesh {
-  const geo = new THREE.BoxGeometry(1.8, TABLE.WALL_H * 2, 0.2);
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x0d1b33,
-    emissive: 0x3366aa,
-    emissiveIntensity: 0.8,
-    roughness: 0.2,
-    metalness: 0.9,
+  const segs = [
+    { x: 2.7,  z: -4.7, w: 0.5,  angle: Math.PI / 7.2 },
+    { x: 2.1,  z: -5.1, w: 0.8,  angle: Math.PI / 4   },
+    { x: 1.4,  z: -5.3, w: 0.8,  angle: Math.PI / 3   },
+  ];
+  return segs.map(({ x, z, w, angle }) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, TABLE.WALL_H * 2, 0.2), mat.clone());
+    mesh.position.set(x, 0.1, z);
+    mesh.rotation.y = angle;
+    return mesh;
   });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(2.0, 0.1, -4.5);
-  mesh.rotation.y = Math.PI / 5;
-  return mesh;
 }
 
 export function createBorderMeshes(): { leftWall: THREE.Mesh; rightWall: THREE.Mesh; topWall: THREE.Mesh } {

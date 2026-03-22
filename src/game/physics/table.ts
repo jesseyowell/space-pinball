@@ -24,34 +24,36 @@ export function createTableBodies(world: RAPIER.World) {
   // Top wall
   addStatic(TABLE.W / 2, TABLE.WALL_H, TABLE.WALL_T / 2, 0, TABLE.WALL_H / 2, -TABLE.L / 2 - TABLE.WALL_T / 2);
 
-  // Launch guide ramp: angled wall at top of right lane, deflects ball into main field
-  const guideAngle = Math.PI / 5; // 36°
-  const guideBody = world.createRigidBody(
-    RAPIER.RigidBodyDesc.fixed()
-      .setTranslation(2.0, 0.1, -4.5)
-      .setRotation({ x: 0, y: Math.sin(guideAngle / 2), z: 0, w: Math.cos(guideAngle / 2) }),
-  );
-  world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, TABLE.WALL_H, 0.1), guideBody);
-  bodies.push(guideBody);
+  // Launch lane separator: runs from just below the arc (z=-4.2) all the way to the drain (z=6.5).
+  // Forms the left wall of the shooter lane so the ball is channelled upward.
+  // center = (-4.2 + 6.5) / 2 = 1.15, hd = (6.5 - (-4.2)) / 2 = 5.35
+  addStatic(0.05, TABLE.WALL_H, 5.35, 2.50, TABLE.WALL_H / 2, 1.15);
 
-  // Second guide segment — 60° redirects ball down into the play field without creating a pocket.
-  const guide2Angle = Math.PI / 3; // 60°
-  const guide2Body = world.createRigidBody(
-    RAPIER.RigidBodyDesc.fixed()
-      .setTranslation(1.4, 0.1, -3.0)
-      .setRotation({ x: 0, y: Math.sin(guide2Angle / 2), z: 0, w: Math.cos(guide2Angle / 2) }),
-  );
-  world.createCollider(RAPIER.ColliderDesc.cuboid(0.7, TABLE.WALL_H, 0.1), guide2Body);
-  bodies.push(guide2Body);
-
-  // Launch lane separator: thin wall separating the right shooter lane from the main field.
-  // Starts at z=2.0 (leaves the top open so the ball can flow into the main field after the guide ramp).
-  // Runs from z=2.0 down through the drain area (z=6.5).
-  addStatic(0.05, TABLE.WALL_H, 2.25, 2.50, TABLE.WALL_H / 2, 4.25);
+  // Launch arc: 3 segments placed directly in the launch lane, progressively angled
+  // so the ball curves smoothly around the top-right corner into the main field.
+  //
+  //  Arc1 (25°) at x=2.7 — in the lane itself, first gentle deflection left
+  //  Arc2 (45°) at x=2.1 — crossing the separator gap, steepening
+  //  Arc3 (60°) at x=1.4 — final redirect into the play field
+  //
+  // All segments sit at z ≈ -5 so they're above the separator and clearly in the
+  // top corner, giving the ball a curved path instead of sharp bounces.
+  const arcSegs = [
+    { x: 2.7,  z: -4.7, hw: 0.25, angle: Math.PI / 7.2 }, // 25°
+    { x: 2.1,  z: -5.1, hw: 0.40, angle: Math.PI / 4   }, // 45°
+    { x: 1.4,  z: -5.3, hw: 0.40, angle: Math.PI / 3   }, // 60°
+  ];
+  arcSegs.forEach(({ x, z, hw, angle }) => {
+    const body = world.createRigidBody(
+      RAPIER.RigidBodyDesc.fixed()
+        .setTranslation(x, 0.1, z)
+        .setRotation({ x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) }),
+    );
+    world.createCollider(RAPIER.ColliderDesc.cuboid(hw, TABLE.WALL_H, 0.1), body);
+    bodies.push(body);
+  });
 
   // Outlane kicker guides: angled walls that redirect side-falling balls back toward the flippers.
-  // Left kicker: ball falling down left side gets deflected right onto the left flipper face.
-  // Right kicker: mirror image on the right side.
   const kickerAngle = Math.PI / 4; // 45°
   const leftKicker = world.createRigidBody(
     RAPIER.RigidBodyDesc.fixed()
@@ -69,11 +71,11 @@ export function createTableBodies(world: RAPIER.World) {
   world.createCollider(RAPIER.ColliderDesc.cuboid(0.6, TABLE.WALL_H, 0.1), rightKicker);
   bodies.push(rightKicker);
 
-  // Drain sensor (bottom strip)
-  // Tall sensor so it catches balls that fall off the floor edge (z=6) before draining
+  // Drain sensor — narrowed to x=-2.3..+2.3 so a ball falling back down the
+  // launch lane (x≈2.75) does NOT count as a ball loss.
   const drainDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, -4.0, TABLE.L / 2 + 1.5);
   const drainBody = world.createRigidBody(drainDesc);
-  const drainCollider = RAPIER.ColliderDesc.cuboid(TABLE.W / 2, 5.0, 0.5).setSensor(true);
+  const drainCollider = RAPIER.ColliderDesc.cuboid(2.3, 5.0, 0.5).setSensor(true);
   world.createCollider(drainCollider, drainBody);
 
   return { bodies, drainBody };

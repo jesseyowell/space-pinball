@@ -8,7 +8,7 @@ import { createStarfield } from '@/game/render/starfield';
 import { Effects } from '@/game/render/effects';
 import { createPhysicsWorld } from '@/game/physics/world';
 import { createTableBodies } from '@/game/physics/table';
-import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchGuideMesh, createLaunchGuide2Mesh, createLaneSeparatorMesh, createKickerMeshes } from '@/game/render/meshes';
+import { createTableMesh, createBallMesh, createFlipperMesh, createBumperMesh, createRampMesh, createTrickHoleMesh, createBorderMeshes, createLaunchArcMeshes, createLaneSeparatorMesh, createKickerMeshes } from '@/game/render/meshes';
 import { createFlippers } from '@/game/physics/flippers';
 import { GameLoop } from '@/game/GameLoop';
 import { createLauncher } from '@/game/physics/launcher';
@@ -59,8 +59,7 @@ export default function GameShell() {
     scene.add(tableMesh);
     const { leftWall, rightWall, topWall } = createBorderMeshes();
     scene.add(leftWall, rightWall, topWall);
-    scene.add(createLaunchGuideMesh());
-    scene.add(createLaunchGuide2Mesh());
+    createLaunchArcMeshes().forEach(m => scene.add(m));
     scene.add(createLaneSeparatorMesh());
     const { left: kickerLeft, right: kickerRight } = createKickerMeshes();
     scene.add(kickerLeft, kickerRight);
