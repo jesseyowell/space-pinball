@@ -15,10 +15,11 @@ import { createLauncher } from '@/game/physics/launcher';
 import { createBumpers, handleBumperCollision } from '@/game/physics/bumpers';
 import { createRamps, handleRampEntrance, handleRampExit } from '@/game/physics/ramps';
 import { createTrickHole, handleTrickHoleTrigger } from '@/game/physics/trickHole';
-import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount } from '@/game/physics/ball';
+import { removeBall, promotePrimaryBall, getPrimaryBallId, incrementRampCount, canTriggerMultiball, setMultifired, spawnBall } from '@/game/physics/ball';
 import { InputHandler } from '@/game/input/InputHandler';
 import { stateMachine } from '@/game/state/StateMachine';
 import { gameStore } from '@/game/gameStore';
+import { scoring } from '@/game/state/scoring';
 import HUD from './HUD';
 
 const loadingStyle = {
@@ -143,7 +144,22 @@ export default function GameShell() {
             const isPrimaryCompletion = handleRampExit(ramp, ball.id, getPrimaryBallId);
             if (isPrimaryCompletion) {
               incrementRampCount();
-              // Multiball trigger handled in Task 22
+
+              // Multiball trigger: spawn bonus ball at table center upper third
+              if (canTriggerMultiball()) {
+                setMultifired();
+                stateMachine.multiBallStart();
+                scoring.setMultiplier(2);
+
+                // Spawn bonus ball at table center upper third
+                const bonusBall = spawnBall(world, 0, 0.5, -1.0);
+                const bonusMesh = createBallMesh();
+                scene.add(bonusMesh);
+                activeBalls.push(bonusBall);
+                ballMeshMap.set(bonusBall.id, bonusMesh);
+                loop.addSyncPair({ body: bonusBall.body, mesh: bonusMesh });
+                bonusBall.body.applyImpulse({ x: (Math.random() - 0.5) * 2, y: 1, z: -5 }, true);
+              }
             }
           }
         });
@@ -183,6 +199,9 @@ export default function GameShell() {
       }
     });
 
+    // Listen for multiball end event
+    const unsubMultiBallEnd = gameStore.on('multiBallEnd', () => scoring.setMultiplier(1));
+
     loop.start();
 
     return () => {
@@ -190,6 +209,7 @@ export default function GameShell() {
       renderer.dispose();
       input.destroy();
       unsubLaunchFire();
+      unsubMultiBallEnd();
     };
   }, [ready]);
 
